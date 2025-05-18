@@ -1,0 +1,32 @@
+<h4><strong>PLEASE&nbsp;READ!&nbsp;Important note about fixing an issue with missing configuration code in the next video lecture</strong></h4><p>In the next lecture named "<strong>Webpack Dev Server</strong>", the <code>devServer</code> configuration code was added to the <strong>webpack.config.js</strong> file without it being explicitly shown in that video lecture.</p><p>Namely, at the <strong>2:15</strong> timestamp (at the 2 minutes 15 seconds point)&nbsp;in the mentioned next video lecture named "Webpack Dev Server", we need to add this <code>devServer</code> configuration code to our <strong>webpack.config.js</strong> file:</p><pre class="prettyprint linenums">devServer: {
+  static: {
+    directory: path.join(__dirname, "./"),
+  },
+},</pre><p>You should add this configuration code appropriately among the other <strong>webpack.config.js</strong> configuration lines — make sure to place it as you will see it placed in Colt's code editor in the next lecture. Check for it from the mentioned <strong>2:15</strong> timestamp in the next video, see the <strong>lines 6-10</strong> shown in Colt's <strong>webpack.config.js</strong> file at that point).</p><p>Again, the addition of this specific <code>devServer</code> configuration code wasn't explicitly shown in the next lecture video, so you need to manually add it by following the instructions above.</p><p>Therefore, by the end of the next video lecture "Webpack Dev Server", your complete <strong>webpack.config.js</strong> code should look like this:</p><pre class="prettyprint linenums">const path = require("path");
+module.exports = {
+  mode: "development",
+  entry: "./src/index.ts",
+  devtool: "inline-source-map",
+  devServer: {
+    static: {
+      directory: path.join(__dirname, "./"),
+    },
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: "ts-loader",
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".js"],
+  },
+  output: {
+    filename: "bundle.js",
+    path: path.resolve(__dirname, "dist"),
+    publicPath: "/dist",
+  },
+};</pre><p>If you have any questions or if you need any help with it, please don't hesitate to reach out on the course Q&amp;A boards.</p>
