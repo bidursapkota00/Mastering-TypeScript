@@ -2,13 +2,90 @@
 
 ## Table of Contents
 
-1. [Why Types?](#why-types)
-2. [Primitive Types](#primitive-types)
-3. [Object Types](#object-types)
-4. [Variables and Type Annotations](#variables-and-type-annotations)
-5. [Type Inference](#type-inference)
-6. [Functions](#functions)
-7. [Practice Exercises - Functions](#practice-exercises---functions)
+1. [Installation](#installation)
+2. [Why Types?](#why-types)
+3. [Primitive Types](#primitive-types)
+4. [Object Types](#object-types)
+5. [Variables and Type Annotations](#variables-and-type-annotations)
+6. [Type Inference](#type-inference)
+7. [Functions](#functions)
+8. [Practice Exercises - Functions](#practice-exercises---functions)
+9. [Quiz - Variables and Functions](#quiz---variables-and-functions)
+
+## Installation
+
+You can use npm to install TypeScript globally, this means that you can use the `tsc` command anywhere in your terminal.
+
+To do this, run `npm install -g typescript`. This will install the latest version.
+
+```bash
+npm install -g typescript
+```
+
+##### Verify installation
+
+```bash
+tsc -v
+```
+
+##### Compile Typescript to Javascript
+
+```bash
+tsc file.ts
+tsc    # compiles all ts files including in nested dir
+```
+
+##### Run Compiled Javascript
+
+```bash
+node file.js
+```
+
+##### Compile Typescript to Javascript in watch mode
+
+```bash
+tsc -w file.ts
+tsc -w    # watches every ts file
+```
+
+##### Generate tsconfig.json
+
+```bash
+tsc --init
+```
+
+##### Some options for updating tsconfig file
+
+```bash
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    # "lib": [], list of types for DOM, ES2020; better remain commented and just control by target
+    "module": "commonjs",    # ES5 or something from browser, commonjs is for node
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "noEmitOnError": true,
+    "strict": true,
+    # "strictNullChecks": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "src/tests/**/*"]
+}
+```
+
+##### Side Note: "use strict" directive in JavaScript
+
+- Enables strict mode. Eg:
+
+```js
+"use strict";
+apple = 5; // throws error since apple not defined yet
+console.log(apple);
+```
 
 ## Why Types?
 
@@ -253,3 +330,10 @@ console.log(isLeapYear(2013)); // false (not divisible by 4)
 console.log(isLeapYear(1900)); // false (divisible by 100, not by 400)
 console.log(isLeapYear(2000)); // true (divisible by 400)
 ```
+
+## Quiz - Variables and Functions
+
+[Variables Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/03-variables/3.1%20Super%20Quick%20Quiz!.html "Variables Quiz Link")
+[Inference Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/03-variables/8.2%20Inference%20Quiz.html "Inference Quiz Link")
+[Function Parameter Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/04-functions/2.3%20Function%20Parameter%20Quiz.html "[Function Parameter Quiz Link")
+[Return Type Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/04-functions/8.4%20Return%20Type%20Quiz.html "[Return Type Quiz Link")
