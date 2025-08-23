@@ -646,3 +646,11 @@ const products: Product[] = [
 
 console.log(getTotal(products)); // 18.75
 ```
+
+### Side Note: Type vs Interface
+
+- Interface - Only for object shapes
+- Type - Can alias any type
+- Interfaces are "open" and can be extended/merged, while type aliases are "closed" which means:
+  - Interface - Supports declaration merging
+  - Type - Does NOT support declaration merging
