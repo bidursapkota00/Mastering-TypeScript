@@ -14,10 +14,12 @@
 10. [Objects in TypeScript](#objects-in-typeScript)
 11. [Arrays in TypeScript](#arrays-in-typeScript)
 12. [Union Types](#union-types)
-13. [Narrowing the Type](#narrowing-the-type)
+13. [Narrowing the Type with typeof](#narrowing-the-type-with-typeof)
 14. [Type Assertions](#type-assertions)
 15. [Literal Types](#literal-types)
 16. [Exercises](#exercises)
+17. [Tuples](#tuples)
+18. [Enums](#enums)
 
 ## Installation
 
@@ -728,7 +730,7 @@ const data: number[] | string[] = [1, 2, 3]; // All numbers
 
 ---
 
-## Narrowing the Type
+## Narrowing the Type with typeof
 
 Narrowing is the process of checking what type a value actually is before working with it. Since union types allow multiple possibilities, it's good practice to verify the type before performing type-specific operations.
 
@@ -956,3 +958,84 @@ greet(["Alice", "Bob", "Carol"]); // Hello, Alice / Hello, Bob / Hello, Carol
 ```
 
 ---
+
+## Tuples
+
+Tuples are a special type exclusive to TypeScript (they don't exist in JavaScript). They are **arrays of fixed lengths** and ordered with specific types - like super rigid arrays.
+
+- Fixed length arrays with predetermined types for each position
+- **Order matters - each position has a specific type**
+- More restrictive than regular arrays but provide better type safety
+
+### Examples
+
+```typescript
+// These are NOT tuples:
+// const stuff: (string | number)[] = [1,'asd', 'asdasd', 'asdasd', 2]
+// const color: number[] = [23,45,234,234]
+
+// This is a tuple!
+const color: [number, number, number] = [255, 0, 45];
+
+type HTTPResponse = [number, string];
+
+const goodRes: HTTPResponse = [200, "OK"];
+
+// An array of tuples:
+const responses: HTTPResponse[] = [
+  [404, "Not Found"],
+  [200, "OK"],
+];
+```
+
+### Quiz - Tuples
+
+[Tuples Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/08-tuples-enums/3.6%20Tuples%20Quiz.html "Tuples Quiz Link")
+
+## Enums
+
+Enums allow us to define a set of **named constants**. We can give these constants numeric or string values. There's quite a few options when it comes to enums!
+
+- Define a set of named constants
+- Can have numeric or string values
+- **Provide better readability and maintainability**
+- Help prevent magic numbers/strings in code
+
+### Examples
+
+#### Numeric Enum
+
+```typescript
+enum OrderStatus {
+  PENDING,
+  SHIPPED,
+  DELIVERED,
+  RETURNED,
+}
+const myStatus = OrderStatus.DELIVERED;
+
+function isDelivered(status: OrderStatus) {
+  return status === OrderStatus.DELIVERED;
+}
+
+isDelivered(OrderStatus.RETURNED);
+```
+
+#### String Enum
+
+```typescript
+enum ArrowKeys {
+  UP = "up",
+  DOWN = "down",
+  LEFT = "left",
+  RIGHT = "right",
+}
+
+// Simple use case:
+function move(direction: ArrowKeys) {
+  console.log(`Moving ${direction}`);
+}
+
+move(ArrowKeys.UP); // "Moving up"
+move(ArrowKeys.LEFT); // "Moving left"
+```
