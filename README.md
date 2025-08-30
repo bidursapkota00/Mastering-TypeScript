@@ -13,6 +13,11 @@
 9. [Quiz - Variables and Functions](#quiz---variables-and-functions)
 10. [Objects in TypeScript](#objects-in-typeScript)
 11. [Arrays in TypeScript](#arrays-in-typeScript)
+12. [Union Types](#union-types)
+13. [Narrowing the Type](#narrowing-the-type)
+14. [Type Assertions](#type-assertions)
+15. [Literal Types](#literal-types)
+16. [Exercises](#exercises)
 
 ## Installation
 
@@ -654,3 +659,300 @@ console.log(getTotal(products)); // 18.75
 - Interfaces are "open" and can be extended/merged, while type aliases are "closed" which means:
   - Interface - Supports declaration merging
   - Type - Does NOT support declaration merging
+
+---
+
+## Union Types
+
+Union types allow us to give a value multiple possible types. If the eventual value's type is included in the union, TypeScript will be satisfied. We create union types using the pipe character `|` to separate the types we want to include.
+
+Think of it as saying: **"This thing is allowed to be this, this, or this"**. TypeScript will enforce these constraints throughout your code.
+
+### Basic Example
+
+```typescript
+// Basic Union Type
+let age: number | string = 21;
+age = 23; // Valid - number
+age = "24"; // Valid - string
+// age = true;   // Error - boolean not in union
+
+type User = {
+  firstName: string;
+  middleName: string | undefined; // Union with undefined
+  lastName: string;
+};
+```
+
+### Union Types with Type Aliases
+
+```typescript
+type Point = {
+  x: number;
+  y: number;
+};
+
+type Location = {
+  lat: number;
+  long: number;
+};
+
+// Union type with custom types
+let coordinates: Point | Location = { x: 1, y: 34 };
+coordinates = { lat: 321.213, long: 23.334 };
+```
+
+### Function Parameters with Union Types
+
+```typescript
+function printAge(age: number | string): void {
+  console.log(`You are ${age} years old`);
+}
+
+printAge(25); // Works with number
+printAge("25"); // Works with string
+```
+
+### Union Types with Arrays
+
+```typescript
+// Array that can contain Point OR Location objects
+const coords: (Point | Location)[] = [];
+coords.push({ lat: 321.213, long: 23.334 }); // Location
+coords.push({ x: 213, y: 43 }); // Point
+
+// Array that is EITHER all numbers OR all strings (not mixed)
+const data: number[] | string[] = [1, 2, 3]; // All numbers
+// const mixed: number[] | string[] = [1, "2"]; // Mixed not allowed
+```
+
+---
+
+## Narrowing the Type
+
+Narrowing is the process of checking what type a value actually is before working with it. Since union types allow multiple possibilities, it's good practice to verify the type before performing type-specific operations.
+
+### Example with Type Guards
+
+```typescript
+function calculateTax(price: number | string, tax: number): number {
+  // Type narrowing using typeof
+  if (typeof price === "string") {
+    // TypeScript now knows price is a string
+    price = parseFloat(price.replace("$", ""));
+  }
+  // TypeScript now knows price is definitely a number
+  return price * tax;
+}
+
+calculateTax(100, 0.1); // Works with number
+calculateTax("$100", 0.1); // Works with string
+```
+
+---
+
+## Type Assertions
+
+Sometimes you have more specific information about a value's type than TypeScript can infer. Type assertions allow you to tell TypeScript: **"Trust me, I know this value is of this specific type"**.
+
+Use the `as` keyword followed by the type you want to assert.
+
+**Warning**: Type assertions don't perform runtime checks - they're purely for TypeScript's type system.
+
+### Basic Example
+
+```ts
+let instruction: unknown = "saycheze";
+console.log(instruction);
+
+let leng: number = (instruction as string).length;
+console.log(leng);
+```
+
+### Real Example
+
+```ts
+function getStudentDataFromServer() {
+  let name: string = "yash";
+  return {
+    id: 89,
+    name: name,
+  };
+}
+
+// Frontend
+type Student = {
+  id: number;
+  name: string;
+};
+
+let student = getStudentDataFromServer() as Student;
+```
+
+### DOM Example
+
+```typescript
+// TypeScript knows this could be any HTMLElement or null
+const myPic = document.getElementById("profile-image");
+
+// We assert it's specifically an HTMLImageElement
+const myPic = document.getElementById("profile-image") as HTMLImageElement;
+```
+
+---
+
+## Literal Types
+
+Literal types **represent exact values, not just types**. Instead of saying "this is a string", you can say **"this is exactly the string 'hello'"**.
+
+On their own, literal types might seem limiting, but when combined with unions, they create powerful, fine-tuned type constraints.
+
+### Basic Literal Types
+
+```typescript
+// Literal number type
+let zero: 0 = 0;
+// zero = 1; // Error - can only be 0
+
+// Literal string type
+let mood: "Happy" | "Sad" = "Happy";
+mood = "Sad"; // Valid
+// mood = "Angry"; // Error - not in union
+```
+
+### Practical Literal Type Example
+
+```typescript
+type DayOfWeek =
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday"
+  | "Sunday";
+
+let today: DayOfWeek = "Sunday";
+// today = "Funday"; // Error - not a valid day
+
+function isWeekend(day: DayOfWeek): boolean {
+  return day === "Saturday" || day === "Sunday";
+}
+```
+
+### Literal Types with Functions
+
+```typescript
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+
+function makeRequest(url: string, method: HttpMethod): void {
+  console.log(`Making ${method} request to ${url}`);
+}
+
+makeRequest("/api/users", "GET"); // Valid
+// makeRequest("/api/users", "PATCH"); // Error
+```
+
+---
+
+## Exercises
+
+### Exercise 1: Basic Union Variable
+
+#### Create a variable that can be a number OR a boolean
+
+```typescript
+let highScore: number | boolean;
+highScore = 1;
+highScore = false;
+```
+
+### Exercise 2: Array Union Types
+
+#### Create Array that is EITHER all numbers OR all strings (not mixed)
+
+```typescript
+const stuff: number[] | string[] = [];
+```
+
+### Exercise 3: Literal Type Definition
+
+#### Create a literal type for skill levels. There are 4 allowed values: "Beginner", "Intermediate", "Advanced", and "Expert"
+
+```typescript
+type SkillLevel = "Beginner" | "Intermediate" | "Advanced" | "Expert";
+```
+
+### Exercise 4: Complex Type with Unions
+
+#### Create a type called SkiSchoolStudent. name must be a string. age must be a number. sport must be "ski" or "snowboard". level must be a value from the SkillLevel type (from above)
+
+```typescript
+type SkiSchoolStudent = {
+  name: string;
+  age: number;
+  sport: "ski" | "snowboard"; // Literal union
+  level: SkillLevel; // Using our literal type
+};
+
+// Example usage
+const student: SkiSchoolStudent = {
+  name: "Alice",
+  age: 25,
+  sport: "snowboard",
+  level: "Intermediate",
+};
+```
+
+### Exercise 5: Color System
+
+#### Define a type to represent an RGB color. r should be a number. g should be a number. b should be a number
+
+```typescript
+type RGB = {
+  r: number;
+  g: number;
+  b: number;
+};
+```
+
+#### Define a type to represent an HSL color. h should be a number. s should be a number. l should be a number
+
+```typescript
+type HSL = {
+  h: number;
+  s: number;
+  l: number;
+};
+```
+
+#### Create an array called colors that can hold a mixture of RGB and HSL color types
+
+```typescript
+const colors: (RGB | HSL)[] = [];
+colors.push({ r: 255, g: 0, b: 0 }); // RGB red
+colors.push({ h: 240, s: 100, l: 50 }); // HSL blue
+```
+
+### Exercise 6: Function with Union Parameters and Type Narrowing
+
+#### Write a function called greet that accepts a single string OR an array of strings. It should print "Hello, <name>" for that single person OR greet each person in the array with the same format
+
+```typescript
+const greet = (person: string | string[]): void => {
+  if (typeof person === "string") {
+    // Narrowing: we know it's a single string
+    console.log(`Hello, ${person}`);
+  } else {
+    // Narrowing: we know it's an array of strings
+    for (let p of person) {
+      console.log(`Hello, ${p}`);
+    }
+  }
+};
+
+greet("John"); // Hello, John
+greet(["Alice", "Bob", "Carol"]); // Hello, Alice / Hello, Bob / Hello, Carol
+```
+
+---
