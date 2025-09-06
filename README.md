@@ -20,6 +20,8 @@
 16. [Exercises](#exercises)
 17. [Tuples](#tuples)
 18. [Enums](#enums)
+19. [Interfaces](#interfaces)
+20. [Generics](#generics)
 
 ## Installation
 
@@ -504,6 +506,111 @@ const christy: CatDog = {
 };
 ```
 
+### Type Manipulation Utilities
+
+```ts
+// Original User type
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+  isActive: boolean;
+};
+
+// 1. Partial<T> - Makes all properties optional
+type PartialUser = Partial<User>;
+// Result: { id?: number; name?: string; email?: string; age?: number; isActive?: boolean; }
+
+const updateUser: PartialUser = {
+  name: "John", // Only updating name
+  age: 25, // Only updating age
+  // Other properties are optional, so we don't need them
+};
+
+// 2. Required<T> - Makes all properties required (opposite of Partial)
+type RequiredUser = Required<PartialUser>;
+// Result: { id: number; name: string; email: string; age: number; isActive: boolean; }
+
+const completeUser: RequiredUser = {
+  id: 1,
+  name: "John",
+  email: "john@example.com",
+  age: 25,
+  isActive: true,
+  // All properties are required now
+};
+
+// 3. Omit<T, K> - Excludes specific properties
+type UserWithoutAge = Omit<User, "age">;
+// Result: { id: number; name: string; email: string; isActive: boolean; }
+
+const userNoAge: UserWithoutAge = {
+  id: 1,
+  name: "Jane",
+  email: "jane@example.com",
+  isActive: true,
+  // 'age' property is not allowed here
+};
+
+// You can omit multiple properties
+type UserBasic = Omit<User, "age" | "isActive">;
+// Result: { id: number; name: string; email: string; }
+
+const basicUser: UserBasic = {
+  id: 1,
+  name: "Bob",
+  email: "bob@example.com",
+  // Neither 'age' nor 'isActive' are allowed
+};
+
+// 4. Pick<T, K> - Selects only specific properties
+type UserNameOnly = Pick<User, "name">;
+// Result: { name: string; }
+
+const nameOnly: UserNameOnly = {
+  name: "Alice",
+  // Only 'name' property is allowed
+};
+
+// Pick multiple properties
+type UserIdAndName = Pick<User, "id" | "name">;
+// Result: { id: number; name: string; }
+
+const idAndName: UserIdAndName = {
+  id: 1,
+  name: "Charlie",
+  // Only 'id' and 'name' are allowed
+};
+
+// Real-world usage examples:
+
+// API response that might have missing fields
+function updateUserProfile(userId: number, updates: PartialUser): void {
+  // Can update any combination of user fields
+  console.log(`Updating user ${userId} with:`, updates);
+}
+
+updateUserProfile(1, { name: "New Name" }); // Valid
+updateUserProfile(1, { email: "new@email.com", age: 30 }); // Valid
+
+// Form data that doesn't need sensitive info
+function displayUserCard(user: Omit<User, "id" | "email">): string {
+  return `${user.name} (${user.age} years old) - ${
+    user.isActive ? "Active" : "Inactive"
+  }`;
+}
+
+// Search function that only needs name
+function searchUserByName(criteria: Pick<User, "name">): User[] {
+  // Implementation would search by name only
+  return [];
+}
+
+searchUserByName({ name: "John" }); // Valid
+// searchUserByName({ name: "John", age: 25 }); // Error: 'age' not allowed
+```
+
 ### Exercise 1
 
 - Write the Movie type alias to make the following two variables properly typed
@@ -653,14 +760,6 @@ const products: Product[] = [
 
 console.log(getTotal(products)); // 18.75
 ```
-
-### Side Note: Type vs Interface
-
-- Interface - Only for object shapes
-- Type - Can alias any type
-- Interfaces are "open" and can be extended/merged, while type aliases are "closed" which means:
-  - Interface - Supports declaration merging
-  - Type - Does NOT support declaration merging
 
 ---
 
@@ -1038,4 +1137,307 @@ function move(direction: ArrowKeys) {
 
 move(ArrowKeys.UP); // "Moving up"
 move(ArrowKeys.LEFT); // "Moving left"
+```
+
+## Interfaces
+
+Interfaces serve almost the exact same purpose as type aliases (with a slightly different syntax). We can use them to create reusable, modular types that describe the shapes of **objects**.
+
+### Basic Interface vs Type Alias
+
+```typescript
+// Point as a TYPE ALIAS
+type Point = {
+  x: number;
+  y: number;
+};
+
+// Point using an INTERFACE:
+interface Point {
+  x: number;
+  y: number;
+}
+
+const pt: Point = { x: 123, y: 1234 };
+```
+
+### Interface Properties
+
+Interfaces can include optional properties, readonly properties, and methods.
+
+```typescript
+interface Person {
+  readonly id: number; // Cannot be modified after creation
+  first: string;
+  last: string;
+  nickname?: string; // Optional property
+  sayHi(): string; // Method definition
+  // sayHi: () => string;
+}
+
+const thomas: Person = {
+  first: "Thomas",
+  last: "Hardy",
+  nickname: "Tom",
+  id: 21837,
+  sayHi: () => {
+    return "Hello!";
+  },
+};
+
+thomas.first = "Updated"; // Allowed
+// thomas.id = 238974;    // Error: readonly property
+
+// Example 2
+interface Product {
+  name: string;
+  price: number;
+  applyDiscount(discount: number): number;
+}
+
+const shoes: Product = {
+  name: "Blue Suede Shoes",
+  price: 100,
+  applyDiscount(amount: number) {
+    const newPrice = this.price * (1 - amount);
+    this.price = newPrice;
+    return this.price;
+  },
+};
+
+console.log(shoes.applyDiscount(0.4)); // 60
+```
+
+### Re-opening Interfaces
+
+Unlike type aliases, interfaces can be "re-opened" to add new properties.
+
+```typescript
+interface Dog {
+  name: string;
+  age: number;
+}
+
+interface Dog {
+  breed: string;
+  bark(): string;
+}
+
+const elton: Dog = {
+  name: "Elton",
+  age: 0.5,
+  breed: "Australian Shepherd",
+  bark() {
+    return "WOOF WOOF!";
+  },
+};
+```
+
+### Extending Interfaces
+
+Interfaces can extend other interfaces to inherit their properties.
+
+```typescript
+// Single inheritance
+interface ServiceDog extends Dog {
+  job: "drug sniffer" | "bomb" | "guide dog";
+}
+
+const chewy: ServiceDog = {
+  name: "Chewy",
+  age: 4.5,
+  breed: "Lab",
+  bark() {
+    return "Bark!";
+  },
+  job: "guide dog",
+};
+```
+
+### Multiple Interface Inheritance
+
+An interface can extend multiple interfaces simultaneously.
+
+```typescript
+interface Human {
+  name: string;
+}
+
+interface Employee {
+  readonly id: number;
+  email: string;
+}
+
+interface Engineer extends Human, Employee {
+  level: string;
+  languages: string[];
+}
+
+const pierre: Engineer = {
+  name: "Pierre",
+  id: 123897,
+  email: "pierre@gmail.com",
+  level: "senior",
+  languages: ["JS", "Python"],
+};
+```
+
+### Interface vs Type
+
+- Interface - Only for object shapes
+- Type - Can alias any type
+- Interfaces are "open" and can be extended/merged, while type aliases are "closed" which means:
+  - Interface - Supports declaration merging
+  - Type - Does NOT support declaration merging
+
+| Feature             | Interface         | Type Alias          |
+| ------------------- | ----------------- | ------------------- |
+| Re-opening          | Can be re-opened  | Cannot be re-opened |
+| Extending           | `extends` keyword | `&` intersection    |
+| Primitives          | Objects only      | Any type            |
+| Computed Properties | Limited           | Full support        |
+
+### Quiz - Interface
+
+[Interface Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/09-interfaces/5.7%20Interface%20Methods%20Quiz.html "Interface Quiz Link")
+
+## Generics
+
+Generics allow us to **define** reusable **functions and classes that work with multiple types** rather than a single type. They are used extensively throughout TypeScript.
+
+### The Problem Without Generics
+
+Without generics, you'd need separate functions for each type.
+
+```typescript
+function numberIdentity(item: number): number {
+  return item;
+}
+function stringIdentity(item: string): string {
+  return item;
+}
+function booleanIdentity(item: boolean): boolean {
+  return item;
+}
+
+// Hack
+function identity(item: any): any {
+  return item;
+}
+```
+
+### Generic Functions
+
+A single generic function can work with multiple types.
+
+```typescript
+function identity<T>(item: T): T {
+  return item;
+}
+
+identity<number>(7);
+identity<string>("hello");
+identity("auto-inferred"); // Type can be inferred
+```
+
+### Generic Functions with Arrays
+
+Generics work great with arrays and collections.
+
+```typescript
+function getRandomElement<T>(list: T[]): T {
+  const randIdx = Math.floor(Math.random() * list.length);
+  return list[randIdx];
+}
+
+console.log(getRandomElement<string>(["a", "b", "c"]));
+getRandomElement<number>([5, 6, 21, 354, 567, 234, 654]);
+getRandomElement([1, 2, 3, 4]); // Type inferred as number[]
+```
+
+### Generic Constraints
+
+You can constrain generic types to ensure they have certain properties.
+
+```typescript
+// Constraint: T must be an object
+function merge<T extends object, U extends object>(object1: T, object2: U) {
+  return {
+    ...object1,
+    ...object2,
+  };
+}
+
+const comboObj = merge({ name: "colt" }, { pets: ["blue", "elton"] });
+```
+
+### Interface-based Constraints
+
+Create interfaces to define what properties your generic types must have.
+
+```typescript
+interface Lengthy {
+  length: number;
+}
+
+function printDoubleLength<T extends Lengthy>(thing: T): number {
+  return thing.length * 2;
+}
+
+printDoubleLength("string"); // strings have length
+printDoubleLength([1, 2, 3]); // arrays have length
+// printDoubleLength(234); // numbers don't have length
+```
+
+### Default Generic Types
+
+You can provide default types for your generics.
+
+```typescript
+function makeEmptyArray<T = number>(): T[] {
+  return [];
+}
+
+const nums = makeEmptyArray(); // T defaults to number
+const bools = makeEmptyArray<boolean>(); // T explicitly set to boolean
+```
+
+### Generic Classes
+
+Classes can also use generics to work with multiple types.
+
+```typescript
+interface Song {
+  title: string;
+  artist: string;
+}
+
+interface Video {
+  title: string;
+  creator: string;
+  resolution: string;
+}
+
+class Playlist<T> {
+  public queue: T[] = [];
+
+  add(el: T) {
+    this.queue.push(el);
+  }
+}
+
+const songs = new Playlist<Song>();
+const videos = new Playlist<Video>();
+```
+
+### Using Built-in Generics
+
+TypeScript provides generics for DOM methods and other built-in functions.
+
+```typescript
+// Providing a type to querySelector:
+const inputEl = document.querySelector<HTMLInputElement>("#username")!;
+inputEl.value = "Hacked!";
+
+const btn = document.querySelector<HTMLButtonElement>(".btn")!;
 ```
