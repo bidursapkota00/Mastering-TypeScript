@@ -22,6 +22,7 @@
 18. [Enums](#enums)
 19. [Interfaces](#interfaces)
 20. [Generics](#generics)
+21. [Type Narrowing](#type-narrowing)
 
 ## Installation
 
@@ -67,21 +68,20 @@ tsc --init
 
 ##### Some options for updating tsconfig file
 
-```bash
+```json
 {
   "compilerOptions": {
     "target": "ES2020",
-    # "lib": [], list of types for DOM, ES2020; better remain commented and just control by target
-    "module": "commonjs",    # ES5 or something from browser, commonjs is for node
+    // "lib": [], list of types for DOM, ES2020; better remain commented and just control by target
+    "module": "commonjs", // ES5 or something from browser, commonjs is for node
     "outDir": "./dist",
     "rootDir": "./src",
     "noEmitOnError": true,
     "strict": true,
-    # "strictNullChecks": true,
+    // "strictNullChecks": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "src/tests/**/*"]
@@ -1440,4 +1440,231 @@ const inputEl = document.querySelector<HTMLInputElement>("#username")!;
 inputEl.value = "Hacked!";
 
 const btn = document.querySelector<HTMLButtonElement>(".btn")!;
+```
+
+## Type Narrowing
+
+Type narrowing is the process of **refining types within conditional blocks. When working with union types**, TypeScript allows you to narrow down the type to more specific types based on runtime checks.
+
+### Typeof Guards
+
+**Typeof guards** involve checking the type of a value using JavaScript's `typeof` operator before working with it. This is useful when dealing with primitive union types.
+
+```typescript
+function triple(value: number | string) {
+  if (typeof value === "string") {
+    // TypeScript knows value is string here
+    return value.repeat(3);
+  }
+  // TypeScript knows value is number here
+  return value * 3;
+}
+
+console.log(triple("hello")); // "hellohellohello"
+console.log(triple(5)); // 15
+```
+
+### Truthiness Guards
+
+**Truthiness guards** check whether a value is truthy or falsy. This is particularly helpful for handling potentially `null` or `undefined` values.
+
+```typescript
+const printLetters = (word?: string) => {
+  if (word) {
+    // TypeScript knows word is string (not undefined) here
+    for (let char of word) {
+      console.log(char);
+    }
+  } else {
+    console.log("YOU DID NOT PASS IN A WORD!");
+  }
+};
+
+// DOM element example
+const el = document.getElementById("myButton");
+if (el) {
+  // TypeScript knows el is HTMLElement (not null) here
+  el.addEventListener("click", () => console.log("Clicked!"));
+} else {
+  console.log("Element not found");
+}
+```
+
+### Equality Narrowing
+
+**Equality narrowing** compares values to determine their types. When two values are equal, TypeScript can infer they must be of the same type.
+
+```typescript
+function someDemo(x: string | number, y: string | boolean) {
+  if (x === y) {
+    // TypeScript knows both x and y are strings here
+    x.toUpperCase(); // Works because x is definitely a string
+  }
+}
+```
+
+### In Operator Narrowing
+
+The **`in` operator** checks if a property exists in an object. This allows TypeScript to narrow types based on the presence of specific properties.
+
+```typescript
+interface Movie {
+  title: string;
+  duration: number;
+}
+
+interface TVShow {
+  title: string;
+  numEpisodes: number;
+  episodeDuration: number;
+}
+
+function getRuntime(media: Movie | TVShow) {
+  if ("numEpisodes" in media) {
+    // TypeScript knows media is TVShow here
+    return media.numEpisodes * media.episodeDuration;
+  }
+  // TypeScript knows media is Movie here
+  return media.duration;
+}
+
+console.log(getRuntime({ title: "Amadeus", duration: 140 })); // 140
+console.log(
+  getRuntime({ title: "Spongebob", numEpisodes: 80, episodeDuration: 30 })
+); // 2400
+```
+
+### Instanceof Narrowing
+
+**`instanceof` narrowing** checks if an object is an instance of a particular class or constructor function.
+
+```typescript
+// With built-in types
+function printFullDate(date: string | Date) {
+  if (date instanceof Date) {
+    // TypeScript knows date is Date here
+    console.log(date.toUTCString());
+  } else {
+    // TypeScript knows date is string here
+    console.log(new Date(date).toUTCString());
+  }
+}
+
+// With custom classes
+class User {
+  constructor(public username: string) {}
+}
+
+class Company {
+  constructor(public name: string) {}
+}
+
+function printName(entity: User | Company) {
+  if (entity instanceof User) {
+    // TypeScript knows entity is User here
+    console.log(`User: ${entity.username}`);
+  } else {
+    // TypeScript knows entity is Company here
+    console.log(`Company: ${entity.name}`);
+  }
+}
+```
+
+### Type Predicates
+
+**Type predicates** are custom functions that return a boolean and tell TypeScript about the type of a value. They use the special `parameterName is Type` return type syntax.
+
+```typescript
+interface Cat {
+  name: string;
+  numLives: number;
+}
+
+interface Dog {
+  name: string;
+  breed: string;
+}
+
+// Type predicate function
+function isCat(animal: Cat | Dog): animal is Cat {
+  return (animal as Cat).numLives !== undefined;
+}
+
+function makeNoise(animal: Cat | Dog): string {
+  if (isCat(animal)) {
+    // TypeScript knows animal is Cat here
+    console.log(`${animal.name} has ${animal.numLives} lives`);
+    return "Meow";
+  } else {
+    // TypeScript knows animal is Dog here
+    console.log(`${animal.name} is a ${animal.breed}`);
+    return "Woof!";
+  }
+}
+```
+
+### Discriminated Unions
+
+**Discriminated unions** use a common literal property (discriminant) to distinguish between different types in a union. This pattern is extremely powerful for type-safe switch statements.
+
+```typescript
+interface Rooster {
+  name: string;
+  weight: number;
+  age: number;
+  kind: "rooster"; // Literal type discriminant
+}
+
+interface Cow {
+  name: string;
+  weight: number;
+  age: number;
+  kind: "cow"; // Literal type discriminant
+}
+
+interface Pig {
+  name: string;
+  weight: number;
+  age: number;
+  kind: "pig"; // Literal type discriminant
+}
+
+interface Sheep {
+  name: string;
+  weight: number;
+  age: number;
+  kind: "sheep"; // Literal type discriminant
+}
+
+type FarmAnimal = Pig | Rooster | Cow | Sheep;
+
+function getFarmAnimalSound(animal: FarmAnimal) {
+  switch (animal.kind) {
+    case "pig":
+      // TypeScript knows animal is Pig here
+      return "Oink!";
+    case "cow":
+      // TypeScript knows animal is Cow here
+      return "Moooo!";
+    case "rooster":
+      // TypeScript knows animal is Rooster here
+      return "Cockadoodledoo!";
+    case "sheep":
+      // TypeScript knows animal is Sheep here
+      return "Baaa!";
+    default:
+      // Exhaustiveness check - ensures all cases are handled
+      const _exhaustiveCheck: never = animal;
+      return _exhaustiveCheck;
+  }
+}
+
+const stevie: Rooster = {
+  name: "Stevie Chicks",
+  weight: 2,
+  age: 1.5,
+  kind: "rooster",
+};
+
+console.log(getFarmAnimalSound(stevie)); // "Cockadoodledoo!"
 ```
