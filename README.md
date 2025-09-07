@@ -23,6 +23,7 @@
 19. [Interfaces](#interfaces)
 20. [Generics](#generics)
 21. [Type Narrowing](#type-narrowing)
+22. [Index Signatures](#index-signatures)
 
 ## Installation
 
@@ -1667,4 +1668,195 @@ const stevie: Rooster = {
 };
 
 console.log(getFarmAnimalSound(stevie)); // "Cockadoodledoo!"
+```
+
+## Index Signatures
+
+Index signatures **allow you to define the types of object properties when you don't know all the property names ahead of time, but you know the shape of the values and what the keys should look like.**
+
+### Basic Syntax
+
+The basic syntax for an index signature is:
+
+```typescript
+[key: KeyType]: ValueType;
+```
+
+Where `KeyType` can be `string`, `number`, or `symbol`, and `ValueType` can be any type.
+
+### String Index Signatures
+
+**String index signatures** allow any string as a key and specify the type of all values.
+
+```typescript
+// Basic string index signature
+interface StringDictionary {
+  [key: string]: string;
+}
+
+const colors: StringDictionary = {
+  red: "#FF0000",
+  green: "#00FF00",
+  blue: "#0000FF",
+  yellow: "#FFFF00",
+};
+
+// You can add any string key
+colors.purple = "#800080"; // Valid
+colors.orange = "#FFA500"; // Valid
+
+// But values must be strings
+// colors.count = 42; // Error: Type 'number' is not assignable to type 'string'
+```
+
+### Number Index Signatures
+
+**Number index signatures** use numbers as keys, useful for array-like objects.
+
+```typescript
+interface NumberDictionary {
+  [index: number]: string;
+}
+
+const fruits: NumberDictionary = {
+  0: "apple",
+  1: "banana",
+  2: "orange",
+};
+
+console.log(fruits[0]); // "apple"
+console.log(fruits[1]); // "banana"
+
+// Can be used for sparse arrays
+const sparseArray: NumberDictionary = {
+  10: "ten",
+  100: "hundred",
+  1000: "thousand",
+};
+```
+
+### Mixed Index Signatures
+
+You can combine string and number index signatures.
+
+```typescript
+interface MixedDictionary {
+  [key: string]: string | number;
+  [index: number]: string;
+}
+
+const mixed: MixedDictionary = {
+  name: "John", // string key, string value
+  age: 30, // string key, number value
+  0: "first", // number key, string value
+  1: "second", // number key, string value
+};
+
+console.log(mixed.name); // "John"
+console.log(mixed[0]); // "first"
+```
+
+### Index Signatures with Known Properties
+
+You can combine index signatures with known properties. Known properties must be compatible with the index signature type.
+
+```typescript
+interface UserPreferences {
+  theme: "light" | "dark"; // Known property
+  language: string; // Known property
+  [setting: string]: string; // Index signature
+}
+
+const userPrefs: UserPreferences = {
+  theme: "dark",
+  language: "en",
+  fontSize: "16px", // Additional property via index signature
+  fontFamily: "Arial", // Additional property via index signature
+};
+
+// All known properties are accessible with full type safety
+console.log(userPrefs.theme); // Type: "light" | "dark"
+console.log(userPrefs.language); // Type: string
+
+// Index signature properties are also accessible
+console.log(userPrefs.fontSize); // Type: string
+```
+
+### Generic Index Signatures
+
+Use generics to create flexible, reusable index signature types.
+
+```typescript
+interface Dictionary<T> {
+  [key: string]: T;
+}
+
+// Dictionary of numbers
+const scores: Dictionary<number> = {
+  alice: 95,
+  bob: 87,
+  charlie: 92,
+};
+
+// Dictionary of boolean flags
+const flags: Dictionary<boolean> = {
+  isEnabled: true,
+  isVisible: false,
+  isActive: true,
+};
+
+// Dictionary of objects
+interface User {
+  name: string;
+  email: string;
+}
+
+const users: Dictionary<User> = {
+  user1: { name: "Alice", email: "alice@example.com" },
+  user2: { name: "Bob", email: "bob@example.com" },
+};
+```
+
+### Example with function
+
+```ts
+//These 2 employees have different comp packages
+const employee1 = {
+  base: 100000,
+  yearlyBonus: 20000,
+};
+
+const employee2 = {
+  contract: 110000,
+};
+
+//But we can still compare their payment using an index sig.!
+const totalComp = (salaryObject: { [key: string]: number }) => {
+  let income = 0;
+  for (const key in salaryObject) {
+    income += salaryObject[key];
+  }
+  return income;
+};
+
+totalComp(employee1); // => 120,000
+totalComp(employee2); // => 110,000
+```
+
+### Index Signatures vs Record Utility Type
+
+TypeScript provides a `Record<K, T>` utility type that's often more concise than index signatures.
+
+```typescript
+// Using index signature
+interface IndexSignatureDict {
+  [key: string]: number;
+}
+
+// Using Record utility type (equivalent)
+type RecordDict = Record<string, number>;
+
+// Both work the same way
+const scores1: IndexSignatureDict = { alice: 95, bob: 87 };
+const scores2: RecordDict = { alice: 95, bob: 87 };
 ```
