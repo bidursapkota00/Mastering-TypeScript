@@ -1,4 +1,8 @@
-# TypeScript Course
+# TypeScript Complete Guide
+
+![Bidur Sapkota](https://www.bidursapkota.com.np/_next/image?url=%2Fimages%2Fprofile3.png&w=48&q=75 "Bidur Sapkota - Developer")&nbsp;[Bidur Sapkota](https://www.bidursapkota.com.np/)
+
+![TypeScript Complete Guide by Bidur Sapkota](/5-ts-post.jpg "TypeScript Complete Guide – Blog by Bidur Sapkota")
 
 ## Table of Contents
 
