@@ -24,6 +24,7 @@
 20. [Generics](#generics)
 21. [Type Narrowing](#type-narrowing)
 22. [Index Signatures](#index-signatures)
+23. [TypeScript Classes](#typescript-classes)
 
 ## Installation
 
@@ -1860,3 +1861,175 @@ type RecordDict = Record<string, number>;
 const scores1: IndexSignatureDict = { alice: 95, bob: 87 };
 const scores2: RecordDict = { alice: 95, bob: 87 };
 ```
+
+## TypeScript Classes
+
+### Basic Class Structure
+
+Classes in TypeScript are blueprints for creating objects with specific properties and methods.
+
+```typescript
+class Player {
+  constructor(
+    public first: string,
+    public last: string,
+    protected _score: number
+  ) {}
+}
+```
+
+The `constructor` defines parameters that become class properties. The access modifiers (`public`, `protected`) automatically create and assign these properties.
+
+### Access Modifiers
+
+TypeScript provides three access modifiers to control visibility:
+
+```typescript
+class Player {
+  constructor(
+    public first: string, // Accessible everywhere
+    public last: string,
+    protected _score: number // Accessible in this class and subclasses
+  ) {}
+
+  private secretMethod(): void {
+    // Only accessible within this class
+    console.log("SECRET METHOD!!");
+  }
+}
+```
+
+- **public**: accessible from anywhere (default if not specified)
+- **protected**: accessible within the class and its subclasses
+- **private**: only accessible within the class itself
+
+### Getters and Setters
+
+Getters and setters allow you to control how properties are accessed and modified:
+
+```typescript
+get fullName(): string {
+  return `${this.first} ${this.last}`;
+}
+
+get score(): number {
+  return this._score;
+}
+
+set score(newScore: number) {
+  if (newScore < 0) {
+    throw new Error("Score cannot be negative!");
+  }
+  this._score = newScore;
+}
+
+const elton = new Player("Elton", "Steele", 100);
+elton.fullName;  // Access like a property, not a method
+```
+
+Getters compute values on-the-fly, while setters can validate data before assignment.
+
+### Class Inheritance
+
+Classes can extend other classes to inherit their properties and methods:
+
+```typescript
+class SuperPlayer extends Player {
+  public isAdmin: boolean = true;
+
+  maxScore() {
+    this._score = 99999999; // Can access protected properties from parent
+  }
+}
+```
+
+`SuperPlayer` inherits all properties and methods from `Player` and adds its own functionality.
+
+### Implementing Interfaces
+
+Classes can implement interfaces to ensure they have specific properties and methods:
+
+```typescript
+interface Colorful {
+  color: string;
+}
+
+interface Printable {
+  print(): void;
+}
+
+class Bike implements Colorful {
+  constructor(public color: string) {}
+}
+
+class Jacket implements Colorful, Printable {
+  constructor(public brand: string, public color: string) {}
+
+  print() {
+    console.log(`${this.color} ${this.brand} jacket`);
+  }
+}
+
+const bike1 = new Bike("red");
+const jacket1 = new Jacket("Prada", "black");
+```
+
+A class can implement multiple interfaces, ensuring it has all required properties and methods defined by those interfaces.
+
+### Abstract Classes
+
+Abstract classes serve as base classes that cannot be instantiated directly. They can contain abstract methods that must be implemented by subclasses:
+
+```typescript
+abstract class Employee {
+  constructor(public first: string, public last: string) {}
+
+  abstract getPay(): number; // Must be implemented by subclasses
+
+  greet() {
+    // Concrete method available to all subclasses
+    console.log("HELLO!");
+  }
+}
+```
+
+You cannot create an instance of `Employee` directly; you must extend it.
+
+### Concrete Implementations of Abstract Classes
+
+Subclasses must implement all abstract methods:
+
+```typescript
+class FullTimeEmployee extends Employee {
+  constructor(first: string, last: string, private salary: number) {
+    super(first, last); // Call parent constructor
+  }
+
+  getPay(): number {
+    return this.salary;
+  }
+}
+
+class PartTimeEmployee extends Employee {
+  constructor(
+    first: string,
+    last: string,
+    private hourlyRate: number,
+    private hoursWorked: number
+  ) {
+    super(first, last);
+  }
+
+  getPay(): number {
+    return this.hourlyRate * this.hoursWorked;
+  }
+}
+
+const betty = new FullTimeEmployee("Betty", "White", 95000);
+console.log(betty.getPay()); // 95000
+
+const bill = new PartTimeEmployee("Bill", "Billerson", 24, 1100);
+console.log(bill.getPay()); // 26400
+```
+
+Each subclass provides its own implementation of the abstract `getPay()` method, while inheriting the `greet()` method from the parent class.
