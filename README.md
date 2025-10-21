@@ -14,21 +14,20 @@
 6. [Type Inference](#type-inference)
 7. [Functions](#functions)
 8. [Practice Exercises - Functions](#practice-exercises---functions)
-9. [Quiz - Variables and Functions](#quiz---variables-and-functions)
-10. [Objects in TypeScript](#objects-in-typeScript)
-11. [Arrays in TypeScript](#arrays-in-typeScript)
-12. [Union Types](#union-types)
-13. [Narrowing the Type with typeof](#narrowing-the-type-with-typeof)
-14. [Type Assertions](#type-assertions)
-15. [Literal Types](#literal-types)
-16. [Exercises](#exercises)
-17. [Tuples](#tuples)
-18. [Enums](#enums)
-19. [Interfaces](#interfaces)
-20. [Generics](#generics)
-21. [Type Narrowing](#type-narrowing)
-22. [Index Signatures](#index-signatures)
-23. [TypeScript Classes](#typescript-classes)
+9. [Objects in TypeScript](#objects-in-typeScript)
+10. [Arrays in TypeScript](#arrays-in-typeScript)
+11. [Union Types](#union-types)
+12. [Narrowing the Type with typeof](#narrowing-the-type-with-typeof)
+13. [Type Assertions](#type-assertions)
+14. [Literal Types](#literal-types)
+15. [Exercises](#exercises)
+16. [Tuples](#tuples)
+17. [Enums](#enums)
+18. [Interfaces](#interfaces)
+19. [Generics](#generics)
+20. [Type Narrowing](#type-narrowing)
+21. [Index Signatures](#index-signatures)
+22. [TypeScript Classes](#typescript-classes)
 
 ## Installation
 
@@ -346,16 +345,6 @@ console.log(isLeapYear(2013)); // false (not divisible by 4)
 console.log(isLeapYear(1900)); // false (divisible by 100, not by 400)
 console.log(isLeapYear(2000)); // true (divisible by 400)
 ```
-
-## Quiz - Variables and Functions
-
-[Variables Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/03-variables/3.1%20Super%20Quick%20Quiz!.html "Variables Quiz Link")
-
-[Inference Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/03-variables/8.2%20Inference%20Quiz.html "Inference Quiz Link")
-
-[Function Parameter Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/04-functions/2.3%20Function%20Parameter%20Quiz.html "[Function Parameter Quiz Link")
-
-[Return Type Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/04-functions/8.4%20Return%20Type%20Quiz.html "[Return Type Quiz Link")
 
 ## Objects in TypeScript
 
@@ -680,10 +669,6 @@ function getProfit({ boxOffice: { grossWorldwide, budget } }: Movie): number {
   return grossWorldwide - budget;
 }
 ```
-
-### Quiz
-
-[Object Type Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/05-object-types/4.5%20Object%20Types%20Quiz.html "[Object Type Quiz Link")
 
 ## Arrays in TypeScript
 
@@ -1093,10 +1078,6 @@ const responses: HTTPResponse[] = [
 ];
 ```
 
-### Quiz - Tuples
-
-[Tuples Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/08-tuples-enums/3.6%20Tuples%20Quiz.html "Tuples Quiz Link")
-
 ## Enums
 
 Enums allow us to define a set of **named constants**. We can give these constants numeric or string values. There's quite a few options when it comes to enums!
@@ -1302,10 +1283,6 @@ const pierre: Engineer = {
 | Extending           | `extends` keyword | `&` intersection    |
 | Primitives          | Objects only      | Any type            |
 | Computed Properties | Limited           | Full support        |
-
-### Quiz - Interface
-
-[Interface Quiz Link](https://bidursapkota00.github.io/Mastering-TypeScript/09-interfaces/5.7%20Interface%20Methods%20Quiz.html "Interface Quiz Link")
 
 ## Generics
 
